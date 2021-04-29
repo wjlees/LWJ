@@ -17,5 +17,7 @@ public class SpringConfig {
     @Bean
     public MemberRepository memberRepository() {
         return new MemoryMemberRepository();
+        // 추후 return new DbMemoryMemberRepository();
+        // Db 만 붙여주면 될 것.
     }
 }
