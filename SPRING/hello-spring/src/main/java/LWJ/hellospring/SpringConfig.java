@@ -1,5 +1,6 @@
 package LWJ.hellospring;
 
+import LWJ.hellospring.aop.TimeTraceAop;
 import LWJ.hellospring.repository.*;
 import LWJ.hellospring.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,4 +47,9 @@ public class SpringConfig {
         // 추후 return new DbMemoryMemberRepository();
         // Db 만 붙여주면 될 것.
 //    }
+
+/*    @Bean
+    public TimeTraceAop timeTraceAop() {
+        return new TimeTraceAop();
+    }*/
 }
