@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HistoryRepository {
-    Winning add(Long round, List<Long> numbers);
-    Optional<Winning> find(Long round);
-    Optional<List<Winning>> findByNumber(List<Long> numberList);
+    Long getDataSize();
+    Winning add(Winning winning);
+    Optional<List<Long>> findNumbersByRound(Long round);
+    Optional<List<List<Long>>> findNumbersByNumber(Long number);
     List<Winning> findAll();
 }

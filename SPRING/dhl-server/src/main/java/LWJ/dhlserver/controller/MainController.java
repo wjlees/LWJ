@@ -2,6 +2,8 @@ package LWJ.dhlserver.controller;
 
 import LWJ.dhlserver.custom.Crawling;
 import LWJ.dhlserver.custom.Winning;
+import LWJ.dhlserver.service.HistoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -12,7 +14,13 @@ import java.util.Optional;
 
 @Controller
 public class MainController {
+    private final HistoryService historyService;
     Crawling crawling;
+
+    @Autowired
+    public MainController(HistoryService historyService) {
+        this.historyService = historyService;
+    }
 
     @GetMapping("/")
     public String homeControl() {
@@ -20,9 +28,10 @@ public class MainController {
     }
 
     @GetMapping("/crawl")
+    @ResponseBody
     public Crawling crawling() throws IOException {
         System.out.println("test_print");
-        this.crawling = new Crawling();
+        this.crawling = historyService.crawling();
         return this.crawling;
     }
 
@@ -46,10 +55,8 @@ public class MainController {
 
     @GetMapping("/test")
     @ResponseBody
-    public Winning winning() {
-        Winning winning = new Winning();
-        winning.setRound(123L);
-        return winning;
+    public List<Long> winning() {
+        return historyService.findRoundNumbers(960L);
     }
 
 }
