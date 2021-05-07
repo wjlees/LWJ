@@ -10,5 +10,5 @@ public interface HistoryRepository {
     Winning add(Winning winning);
     Optional<List<Long>> findNumbersByRound(Long round);
     Optional<List<List<Long>>> findNumbersByNumber(Long number);
-    List<Winning> findAll();
+    List<List<Long>> findAll();
 }

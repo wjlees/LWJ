@@ -11,6 +11,10 @@ public class MemoryHistoryRepository implements HistoryRepository {
 
     private Map<Long, List<Long>> repository = new HashMap<>();
 
+    public Map<Long, List<Long>> getRepository() {
+        return repository;
+    }
+
     @Override
     public Long getDataSize() {
         return (long)repository.size();
@@ -34,7 +38,8 @@ public class MemoryHistoryRepository implements HistoryRepository {
     }
 
     @Override
-    public List<Winning> findAll() {
-        return null;
+    public List<List<Long>> findAll() {
+        List<List<Long>> result = repository.values().stream().collect(Collectors.toList());
+        return result;
     }
 }

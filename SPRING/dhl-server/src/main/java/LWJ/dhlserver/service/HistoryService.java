@@ -12,13 +12,19 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HistoryService {
+
     private final HistoryRepository historyRepository;
     private Crawling crawling;
     private List<Document> winningHistory;
     private Long lastRound;
+
+    public Crawling getCrawling() {
+        return crawling;
+    }
 
     @Autowired
     public HistoryService(HistoryRepository historyRepository) throws IOException {
@@ -26,10 +32,14 @@ public class HistoryService {
         crawling();
     }
 
+    public HistoryRepository getHistoryRepository() {
+        return historyRepository;
+    }
+
     public Crawling crawling() throws IOException {
         Document crawlWeb = Jsoup.connect("https://dhlottery.co.kr/common.do?method=main").get();
         Document crawlMobile = Jsoup.connect("https://m.dhlottery.co.kr/common.do?method=main").get();
-        crawling = new Crawling(crawlWeb, crawlMobile);
+        this.crawling = new Crawling(crawlWeb, crawlMobile);
 
         if (historyRepository.getDataSize() == 0) {
             getHistory(crawling);
@@ -48,25 +58,32 @@ public class HistoryService {
         * */
         String winningUrl = "https://dhlottery.co.kr/gameResult.do?method=byWin&drwNo=";
 
-        for (int i = 1; i <= getLastRound(crawling); i++) {
-            Document crawlWinning = Jsoup.connect(winningUrl + String.valueOf(i)).get();
-            ArrayList<Long> numbers = new ArrayList<>();
-            System.out.println("crawling " + i + " round...");
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(0).text()));
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(1).text()));
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(2).text()));
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(3).text()));
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(4).text()));
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(5).text()));
-            numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num bonus").select("p span").get(0).text()));
-            Winning winning = new Winning();
-            winning.setRound((long) i);
-            winning.setNumbers(numbers);
-
+        //for (int i = 1; i <= getLastRound(crawling); i++) {
+        for (int i = 1; i <= 50; i++) {
+            Winning winning = crawlOneRound((long)i);
             historyRepository.add(winning);
             //winningHistory.add(winning);
         }
         return true;
+    }
+
+    public Winning crawlOneRound(Long round) throws IOException {
+        String winningUrl = "https://dhlottery.co.kr/gameResult.do?method=byWin&drwNo=";
+
+        Document crawlWinning = Jsoup.connect(winningUrl + String.valueOf(round)).get();
+        ArrayList<Long> numbers = new ArrayList<>();
+        System.out.println("crawling " + round + " round...");
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(0).text()));
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(1).text()));
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(2).text()));
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(3).text()));
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(4).text()));
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num win").select("p span").get(5).text()));
+        numbers.add(Long.valueOf(crawlWinning.getElementsByClass("num bonus").select("p span").get(0).text()));
+        Winning winning = new Winning();
+        winning.setRound((long) round);
+        winning.setNumbers(numbers);
+        return winning;
     }
 
     public Long getLastRound(Crawling crawling) {
@@ -80,5 +97,14 @@ public class HistoryService {
 
     public List<Long> findRoundNumbers(Long round) {
         return historyRepository.findNumbersByRound(round).get();
+    }
+    public List<List<Long>> findWinningNumbers(Long findNumber) {
+        //for (Long findNumber: findNumbers) {
+        return historyRepository.findNumbersByNumber(findNumber).get();
+        //}
+        //return historyRepository.findNumbersByRound(round).get();
+    }
+    public List<List<Long>> findAllNumbers() {
+        return historyRepository.findAll();
     }
 }
