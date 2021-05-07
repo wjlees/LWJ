@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
@@ -75,6 +76,18 @@ public class MainController {
         return historyService.findRoundNumbers(99L);
     }
 
+    @GetMapping("/numbers")
+    @ResponseBody
+    public List<List<Long>> findNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
+        return findNumbersCommon(numbers);
+    }
+
+
+/*
+ * num 1개에서 6개 => 뭔가 한번에 할 수 있는 방법이 있을것같은데....
+ * */
+
+/*
     @GetMapping("/test/numbers/")
     @ResponseBody
     public List<List<Long>> findNumbers0() {
@@ -82,10 +95,6 @@ public class MainController {
         return findNumbersCommon(new ArrayList<>());
 
     }
-
-    /*
-    * num 1개에서 6개 => 뭔가 한번에 할 수 있는 방법이 있을것같은데....
-    * */
     @GetMapping("/test/numbers/{num1:[0-9]+}")
     @ResponseBody
     public List<List<Long>> findNumbers1(@PathVariable("num1") Long num1) {
@@ -158,9 +167,10 @@ public class MainController {
         numbers.add(num6);
         return findNumbersCommon(numbers);
     }
-
+*/
     public List<List<Long>> findNumbersCommon(List<Long> numbers) {
         List<List<Long>> numbersList = historyService.findAllNumbers();
+        if (numbers == null) return numbersList;
         for (Long number: numbers) {
             List<List<Long>> result = numbersList.stream().filter(numList -> numList.contains(number)).collect(Collectors.toList());
             numbersList = result;
