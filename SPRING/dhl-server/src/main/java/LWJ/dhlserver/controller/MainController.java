@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -58,7 +56,7 @@ public class MainController {
     @GetMapping("/update")
     @ResponseBody
     public Long update() throws IOException {
-        Long lastRound = historyService.getLastRound(historyService.getCrawling());
+        Long lastRound = historyService.getLastRound();
         Long repositoryLastRound = historyService.getHistoryRepository().getDataSize();
         if (lastRound != repositoryLastRound) {
             for (long i = repositoryLastRound + 1L; i <= lastRound; i++) {
@@ -70,19 +68,31 @@ public class MainController {
         return 0L;
     }
 
+
+    @GetMapping("/numbers") // "/numbers?find=1,2,3,4,5,6,7"
+    @ResponseBody
+    public List<List<Long>> findNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
+        return historyService.findNumbersCommon(numbers);
+    }
+
+    @GetMapping("/lastWinning")
+    @ResponseBody
+    public Winning lastWinning() {
+        return historyService.getLastWinning();
+    }
+
+    @GetMapping("/recommend")
+    @ResponseBody
+    public List<Long> recommendNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
+        return historyService.recommendNumbers(numbers);
+    }
+
+/*
     @GetMapping("/test")
     @ResponseBody
     public List<Long> winning() {
         return historyService.findRoundNumbers(99L);
-    }
-
-    @GetMapping("/numbers")
-    @ResponseBody
-    public List<List<Long>> findNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
-        return findNumbersCommon(numbers);
-    }
-
-
+    }*/
 /*
  * num 1개에서 6개 => 뭔가 한번에 할 수 있는 방법이 있을것같은데....
  * */
@@ -168,14 +178,5 @@ public class MainController {
         return findNumbersCommon(numbers);
     }
 */
-    public List<List<Long>> findNumbersCommon(List<Long> numbers) {
-        List<List<Long>> numbersList = historyService.findAllNumbers();
-        if (numbers == null) return numbersList;
-        for (Long number: numbers) {
-            List<List<Long>> result = numbersList.stream().filter(numList -> numList.contains(number)).collect(Collectors.toList());
-            numbersList = result;
-        }
-        return numbersList;
-    }
 
 }

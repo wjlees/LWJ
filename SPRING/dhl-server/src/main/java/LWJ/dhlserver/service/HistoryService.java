@@ -7,12 +7,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HistoryService {
@@ -58,8 +60,8 @@ public class HistoryService {
         * */
         String winningUrl = "https://dhlottery.co.kr/gameResult.do?method=byWin&drwNo=";
 
-        //for (int i = 1; i <= getLastRound(crawling); i++) {
-        for (int i = 1; i <= 1; i++) {
+        //for (int i = 1; i <= getLastRound(); i++) {
+        for (int i = 1; i <= 50; i++) {
             Winning winning = crawlOneRound((long)i);
             historyRepository.add(winning);
             //winningHistory.add(winning);
@@ -86,8 +88,14 @@ public class HistoryService {
         return winning;
     }
 
-    public Long getLastRound(Crawling crawling) {
+    public Long getLastRound() {
         return Long.valueOf(crawling.getWeb().getElementById("lottoDrwNo").text());
+    }
+    public Winning getLastWinning() {
+        Winning winning = new Winning();
+        winning.setRound(getLastRound());
+        winning.setNumbers(findRoundNumbers(winning.getRound()));
+        return winning;
     }
 
     public boolean save(Winning winning) {
@@ -106,5 +114,43 @@ public class HistoryService {
     }
     public List<List<Long>> findAllNumbers() {
         return historyRepository.findAll();
+    }
+    public List<List<Long>> findNumbersCommon(List<Long> numbers) {
+        List<List<Long>> numbersList = findAllNumbers();
+        if (numbers == null) return numbersList;
+        for (Long number: numbers) {
+            List<List<Long>> result = numbersList.stream().filter(numList -> numList.contains(number)).collect(Collectors.toList());
+            numbersList = result;
+        }
+        return numbersList;
+    }
+    public List<Long> recommendNumbers(List<Long> numbers) {
+        List<List<Long>> findNumbers = findNumbersCommon(numbers);
+        List<Long> recommendNumbers = new ArrayList<>();
+        Long[] count = new Long[50];
+        for (int i = 1; i <= 45; i++) {
+            count[i] = 0L;
+        }
+
+        for (List<Long> nums: findNumbers) {
+            for (Long n: nums) {
+                count[Math.toIntExact(n)]++;
+            }
+        }
+
+        for (int i = 0; i < 6; i++) {
+            Long max = -1L;
+            Long max_number = 0L;
+            for (int j = 1; j <= 45; j++) {
+                if (max < count[j] && !recommendNumbers.contains((long)j)) {
+                    max = count[j];
+                    max_number = (long)j;
+                }
+            }
+            recommendNumbers.add(max_number);
+        }
+        recommendNumbers.sort(Long::compareTo);
+
+        return recommendNumbers;
     }
 }

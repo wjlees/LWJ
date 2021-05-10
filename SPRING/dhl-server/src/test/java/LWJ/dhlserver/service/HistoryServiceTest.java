@@ -30,7 +30,7 @@ class HistoryServiceTest {
 //    void afterEach() {
 //
 //    }
-
+/*
     @Test
     void crawling() throws IOException {
         Crawling crawling = historyService.crawling();
@@ -45,8 +45,14 @@ class HistoryServiceTest {
 
     @Test
     void getLastRound() {
-        Long lastRound = historyService.getLastRound(historyService.getCrawling());
-        Assertions.assertThat(lastRound).isEqualTo(961);
+        Long lastRound = historyService.getLastRound();
+        Assertions.assertThat(lastRound).isEqualTo(962);
+    }
+
+    @Test
+    void getLastWinning() {
+        Winning winning = historyService.getLastWinning();
+        Assertions.assertThat(winning.getRound()).isEqualTo(historyService.getLastRound());
     }
 
     @Test
@@ -79,4 +85,5 @@ class HistoryServiceTest {
         List<List<Long>> result = historyService.findAllNumbers();
         Assertions.assertThat((long)result.size()).isEqualTo(historyRepository.getDataSize());
     }
+ */
 }
