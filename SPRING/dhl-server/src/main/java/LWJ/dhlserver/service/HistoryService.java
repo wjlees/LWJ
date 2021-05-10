@@ -59,7 +59,7 @@ public class HistoryService {
         String winningUrl = "https://dhlottery.co.kr/gameResult.do?method=byWin&drwNo=";
 
         //for (int i = 1; i <= getLastRound(crawling); i++) {
-        for (int i = 1; i <= 50; i++) {
+        for (int i = 1; i <= 1; i++) {
             Winning winning = crawlOneRound((long)i);
             historyRepository.add(winning);
             //winningHistory.add(winning);
