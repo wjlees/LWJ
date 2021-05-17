@@ -1,0 +1,44 @@
+<MAX>
+select max(datetime) from animal_ins
+SELECT datetime from ANIMAL_INS order by datetime desc limit 1
+
+<MIN>
+select min(datetime) from animal_ins
+SELECT datetime from animal_ins order by datetime asc limit 1
+
+<count>
+SELECT count(*) from animal_ins
+
+<name 중복제거 count>
+SELECT count (distinct name) from animal_ins
+
+<Table 전체 출력>
+select * from [tablename]
+
+<SORT>
+SELECT * from animal_ins order by animal_id
+
+<name, datetime 출력하는데, animal_id 역순 정렬>
+SELECT name, datetime from animal_ins order by animal_id desc
+
+<조건으로 특정 행 선택하기>
+SELECT animal_id, name from animal_ins where intake_condition = 'sick'
+
+SELECT animal_id, name 
+from animal_ins
+where intake_condition != 'aged'
+
+<여러 기준 정렬>
+SELECT animal_id, name, datetime
+from animal_ins
+order by name asc, datetime desc
+
+
+== GROUP BY ==
+<기준으로 그룹짓기>
+SELECT animal_type, count(*) from animal_ins group by animal_type order by animal_type
+
+=================
+
+<recursive>
+<like>
