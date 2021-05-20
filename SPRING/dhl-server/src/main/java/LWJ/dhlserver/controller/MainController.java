@@ -4,6 +4,7 @@ import LWJ.dhlserver.custom.Crawling;
 import LWJ.dhlserver.custom.Winning;
 import LWJ.dhlserver.service.HistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,9 +54,11 @@ public class MainController {
         return historyService.getCrawling().getMobile().toString();
     }
 
-    @GetMapping("/update")
+    @GetMapping("/update") // crawling + update
+    @Scheduled(cron = "0 0,1 * * * *")
     @ResponseBody
     public Long update() throws IOException {
+        crawling();
         Long lastRound = historyService.getLastRound();
         Long repositoryLastRound = historyService.getHistoryRepository().getDataSize();
         if (lastRound != repositoryLastRound) {
@@ -69,22 +72,22 @@ public class MainController {
     }
 
 
-    @GetMapping("/numbers") // "/numbers?find=1,2,3,4,5,6,7"
+    @GetMapping("/645/numbers") // "/numbers?find=1,2,3,4,5,6,7"
     @ResponseBody
     public List<List<Long>> findNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
         return historyService.findNumbersCommon(numbers);
     }
 
-    @GetMapping("/lastWinning")
+    @GetMapping("/645/lastWinning")
     @ResponseBody
     public Winning lastWinning() {
         return historyService.getLastWinning();
     }
 
-    @GetMapping("/recommend")
+    @GetMapping("/645/recommend")
     @ResponseBody
-    public List<Long> recommendNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
-        return historyService.recommendNumbers(numbers);
+    public List<List<Long>> recommendNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
+        return historyService.recommendNumbersList(numbers);
     }
 
 /*

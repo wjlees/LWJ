@@ -44,7 +44,7 @@ public class HistoryService {
         this.crawling = new Crawling(crawlWeb, crawlMobile);
 
         if (historyRepository.getDataSize() == 0) {
-            getHistory(crawling);
+            initHistory(crawling);
         } else {
             System.out.println("already crawl history");
         }
@@ -52,7 +52,7 @@ public class HistoryService {
         return crawling;
     }
 
-    private boolean getHistory(Crawling crawling) throws IOException {
+    private boolean initHistory(Crawling crawling) throws IOException {
         /*
         * History에 넣는걸로 바꾸고, controller 에서도 crawl에 포함하지말고, crawlHistory 따로 만들던가 할 것.
         * 서버 부팅 후 처음에 하기는 하지만, 켜질 때 말고, 특정 시점에 하도록? 주소 접근하면?
@@ -124,7 +124,50 @@ public class HistoryService {
         }
         return numbersList;
     }
-    public List<Long> recommendNumbers(List<Long> numbers) {
+
+    public List<List<Long>> recommendNumbersList(List<Long> numbers) {
+        List<List<Long>> findNumbers = findNumbersCommon(numbers);
+        List<Long> recommendNumbers = new ArrayList<>();
+        List<List<Long>> recommendNumbersList = new ArrayList<>();
+        List<Long> finishNumber = new ArrayList<>();
+        Long[] count = new Long[50];
+        for (int i = 1; i <= 45; i++) {
+            count[i] = 0L;
+        }
+
+        for (List<Long> nums: findNumbers) {
+            for (Long n: nums) {
+                count[Math.toIntExact(n)]++;
+            }
+        }
+        if (numbers == null) numbers = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            Long max = -1L;
+            Long max_number = 0L;
+            for (Long num: numbers) {
+                recommendNumbers.add(num);
+            }
+            for (int j = 1; j <= 45; j++) {
+                if (max < count[j] && !recommendNumbers.contains((long)j) && !finishNumber.contains((long)j)) {
+                    max = count[j];
+                    max_number = (long)j;
+                }
+            }
+            System.out.println(max_number);
+            finishNumber.add(max_number);
+            recommendNumbers.add(max_number);
+            recommendNumbers.sort(Long::compareTo);
+            System.out.println(recommendNumbers);
+            recommendNumbersList.add(recommendNumbers(recommendNumbers));
+            recommendNumbers.clear();
+
+        }
+
+        return recommendNumbersList;
+    }
+
+    private List<Long> recommendNumbers(List<Long> numbers) {
         List<List<Long>> findNumbers = findNumbersCommon(numbers);
         List<Long> recommendNumbers = new ArrayList<>();
         Long[] count = new Long[50];
