@@ -1,5 +1,6 @@
 package LWJ.dhlserver.repository;
 
+import LWJ.dhlserver.custom.Information;
 import LWJ.dhlserver.custom.Winning;
 import org.springframework.stereotype.Repository;
 
@@ -9,11 +10,12 @@ import java.util.stream.Collectors;
 @Repository
 public class MemoryHistoryRepository implements HistoryRepository {
 
-    private Map<Long, List<Long>> repository = new HashMap<>();
-
-    public Map<Long, List<Long>> getRepository() {
+    /************************* Memory ***************************/
+    private Map<Long, Information> repository = new HashMap<>();
+    public Map<Long, Information> getRepository() {
         return repository;
     }
+    /************************************************************/
 
     @Override
     public Long getDataSize() {
@@ -21,25 +23,30 @@ public class MemoryHistoryRepository implements HistoryRepository {
     }
 
     @Override
-    public Winning add(Winning winning) {
-        repository.put(winning.getRound(), winning.getNumbers());
-        return winning;
+    public Long add(Information information) {
+        Long key = information.getWinning().getRound();
+        repository.put(key, information);
+        return key;
     }
 
     @Override
-    public Optional<List<Long>> findNumbersByRound(Long round) {
-        return Optional.ofNullable(repository.get(round));
+    public Information findInformationByRound(Long round) { // 없으면?
+        Information information = repository.get(round); // 없으면 null
+
+        return information; // 없으면 null return
     }
 
     @Override
-    public Optional<List<List<Long>>> findNumbersByNumber(Long number) {
-        List<List<Long>> result = repository.values().stream().filter(numbers -> numbers.contains(number)).collect(Collectors.toList());
-        return Optional.ofNullable(result);
+    public List<Information> findInformationListByNumber(Long number) {
+        List<Information> result = repository.values().stream().filter(
+                info -> info.getWinning().getNumbers().contains(number)
+        ).collect(Collectors.toList());
+        return result;
     }
 
     @Override
-    public List<List<Long>> findAll() {
-        List<List<Long>> result = repository.values().stream().collect(Collectors.toList());
+    public List<Information> findAll() {
+        List<Information> result = repository.values().stream().collect(Collectors.toList());
         return result;
     }
 }

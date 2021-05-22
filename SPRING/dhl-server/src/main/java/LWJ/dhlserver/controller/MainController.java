@@ -1,27 +1,26 @@
 package LWJ.dhlserver.controller;
 
 import LWJ.dhlserver.custom.Crawling;
+import LWJ.dhlserver.custom.Information;
 import LWJ.dhlserver.custom.Winning;
-import LWJ.dhlserver.service.HistoryService;
+import LWJ.dhlserver.service.HistoryService645;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
-    private final HistoryService historyService;
+    private final HistoryService645 historyService645;
 
     @Autowired
-    public MainController(HistoryService historyService) {
-        this.historyService = historyService;
+    public MainController(HistoryService645 historyService645) {
+        this.historyService645 = historyService645;
     }
 
     @GetMapping("/")
@@ -32,62 +31,62 @@ public class MainController {
     @GetMapping("/crawl")
     @ResponseBody
     public Crawling crawling() throws IOException {
-        System.out.println("test_print");
-        return historyService.crawling();
+        return historyService645.getCrawling(); //????
     }
 
     @GetMapping("/crawl/web")
     @ResponseBody
     public String crawling_web() throws IOException {
-        if (historyService.getCrawling() == null) {
+        if (historyService645.getCrawling() == null) {
             crawling();
         }
-        return historyService.getCrawling().getWeb().toString();
+        return historyService645.getCrawling().getDocuments().get(0).toString();
     }
 
     @GetMapping("/crawl/mobile")
     @ResponseBody
     public String crawling_mobile() throws IOException {
-        if (historyService.getCrawling() == null) {
+        if (historyService645.getCrawling() == null) {
             crawling();
         }
-        return historyService.getCrawling().getMobile().toString();
+        return historyService645.getCrawling().getDocuments().get(1).toString();
     }
 
     @GetMapping("/update") // crawling + update
     @Scheduled(cron = "0 0,1 * * * *")
     @ResponseBody
     public Long update() throws IOException {
-        crawling();
-        Long lastRound = historyService.getLastRound();
-        Long repositoryLastRound = historyService.getHistoryRepository().getDataSize();
-        if (lastRound != repositoryLastRound) {
-            for (long i = repositoryLastRound + 1L; i <= lastRound; i++) {
-                Winning winning = historyService.crawlOneRound(i);
-                historyService.save(winning);
-            }
-            return lastRound - repositoryLastRound;
-        }
+        historyService645.update();
         return 0L;
     }
 
 
-    @GetMapping("/645/numbers") // "/numbers?find=1,2,3,4,5,6,7"
+/*    @GetMapping("/645/numbers") // "/numbers?find=1,2,3,4,5,6,7"
     @ResponseBody
     public List<List<Long>> findNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
-        return historyService.findNumbersCommon(numbers);
+        return historyService645.findNumbersCommon(numbers);
+    }*/
+    // numbers는 알 필요 없음
+    // 만약 알고싶으면 해당 번호에 분포가 어떻고 그런거일거고,
+    // 그러면 recommendService 에서 분포나 개수나 그런거 제공해주면 그걸 가져다가 보여주면 될 것.
+
+    @GetMapping("/645/lastInfo")
+    @ResponseBody
+    public Information lastInfo() {
+        return historyService645.getLastInfo();
     }
 
-    @GetMapping("/645/lastWinning")
+    @GetMapping("/645/nextInfo")
     @ResponseBody
-    public Winning lastWinning() {
-        return historyService.getLastWinning();
+    public Information nowInfo() {
+        return historyService645.getNextInfo();
     }
 
-    @GetMapping("/645/recommend")
+    @GetMapping("/645/recommend") // "/645/recommend?numbers=1,2,3"
+    // find 사용하는 용도로 있는 것. 기본 추천은 nextInfo에 있음.
     @ResponseBody
-    public List<List<Long>> recommendNumbersString(@RequestParam(value="find", required = false) List<Long> numbers) {
-        return historyService.recommendNumbersList(numbers);
+    public List<List<Long>> recommendNumbersString(@RequestParam(value="numbers", required = false) List<Long> numbers) {
+        return historyService645.getRecommendNumbers(numbers);
     }
 
 /*

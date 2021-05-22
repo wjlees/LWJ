@@ -4,22 +4,36 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Crawling {
 
-    private Document web;
-    private Document mobile;
+    private List<String> urls;
+    private List<Document> documents = new ArrayList<>();
 
-    public Crawling(Document web, Document mobile) {
-        this.web = web;
-        this.mobile = mobile;
+    public List<String> getUrls() {
+        return urls;
     }
 
-    public Document getWeb() {
-        return web;
+    public List<Document> getDocuments() {
+        return documents;
     }
 
-    public Document getMobile() {
-        return mobile;
+    public Crawling(List<String> urls) throws IOException {
+        this.urls = urls;
+        this.documents.clear();
+        for (String url: urls) {
+            this.documents.add(Jsoup.connect(url).get());
+        }
     }
+
+    public void newCrawling(List<String> urls) throws IOException {
+        this.urls = urls;
+        this.documents.clear();
+        for (String url: urls) {
+            this.documents.add(Jsoup.connect(url).get());
+        }
+    }
+
 }
