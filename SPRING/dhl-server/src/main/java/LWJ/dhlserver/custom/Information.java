@@ -6,6 +6,7 @@ import java.util.List;
 public class Information {
 
     private Winning winning;
+    private Winning bonusWinning;
     private List<List<Long>> recommend;
     private String winningMoneyTotalStr;
     private String winningMoneyGameStr;
@@ -33,5 +34,11 @@ public class Information {
     }
     public void setWinningMoneyGameStr(String winningMoneyGameStr) {
         this.winningMoneyGameStr = winningMoneyGameStr;
+    }
+    public Winning getBonusWinning() {
+        return bonusWinning;
+    }
+    public void setBonusWinning(Winning bonusWinning) {
+        this.bonusWinning = bonusWinning;
     }
 }

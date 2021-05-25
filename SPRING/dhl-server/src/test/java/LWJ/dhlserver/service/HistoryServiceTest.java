@@ -1,15 +1,17 @@
 package LWJ.dhlserver.service;
 
-import LWJ.dhlserver.repository.MemoryHistoryRepository;
+import LWJ.dhlserver.repository.MemoryHistoryRepository645;
 
 import java.io.IOException;
 
 class HistoryServiceTest {
-    MemoryHistoryRepository historyRepository = new MemoryHistoryRepository();
+    MemoryHistoryRepository645 historyRepository = new MemoryHistoryRepository645();
     HistoryService645 historyService645 = new HistoryService645(historyRepository);
 
     HistoryServiceTest() throws IOException {
     }
+
+
 //
 //    @BeforeEach
 //    void beforeEach() throws IOException {

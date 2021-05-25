@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class MemoryHistoryRepository implements HistoryRepository {
+public class MemoryHistoryRepository645 implements HistoryRepository {
 
     /************************* Memory ***************************/
     private Map<Long, Information> repository = new HashMap<>();

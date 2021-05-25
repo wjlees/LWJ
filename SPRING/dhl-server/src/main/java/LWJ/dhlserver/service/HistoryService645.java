@@ -4,6 +4,7 @@ import LWJ.dhlserver.custom.Crawling;
 import LWJ.dhlserver.custom.Information;
 import LWJ.dhlserver.custom.Winning;
 import LWJ.dhlserver.repository.HistoryRepository;
+import LWJ.dhlserver.repository.MemoryHistoryRepository645;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class HistoryService645 implements HistoryService {
 
     // constructor
     @Autowired
-    public HistoryService645(HistoryRepository historyRepository) throws IOException {
+    public HistoryService645(MemoryHistoryRepository645 historyRepository) throws IOException {
         this.historyRepository = historyRepository;
         this.crawling = new Crawling(urls);
     }
@@ -51,7 +52,7 @@ public class HistoryService645 implements HistoryService {
         * 서버 부팅 후 처음에 하기는 하지만, 켜질 때 말고, 특정 시점에 하도록? 주소 접근하면?
         * 켜질 때 처음에 하는게 낫나?
         * */
-        int size = historyRepository.findAll().size();
+        int size = historyRepository.getDataSize().intValue();
 
         crawling.newCrawling(urls);
         for (int i = size + 1; i <= getDocumentLastRound(crawling); i++) {

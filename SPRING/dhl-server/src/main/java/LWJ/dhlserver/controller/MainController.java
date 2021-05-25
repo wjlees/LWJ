@@ -4,10 +4,12 @@ import LWJ.dhlserver.custom.Crawling;
 import LWJ.dhlserver.custom.Information;
 import LWJ.dhlserver.custom.Winning;
 import LWJ.dhlserver.service.HistoryService645;
+import LWJ.dhlserver.service.HistoryService720;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -17,10 +19,12 @@ import java.util.*;
 @Controller
 public class MainController {
     private final HistoryService645 historyService645;
+    private final HistoryService720 historyService720;
 
     @Autowired
-    public MainController(HistoryService645 historyService645) {
+    public MainController(HistoryService645 historyService645, HistoryService720 historyService720) {
         this.historyService645 = historyService645;
+        this.historyService720 = historyService720;
     }
 
     @GetMapping("/")
@@ -56,7 +60,9 @@ public class MainController {
     @Scheduled(cron = "0 0,1 * * * *")
     @ResponseBody
     public Long update() throws IOException {
+        historyService720.update();
         historyService645.update();
+
         return 0L;
     }
 
@@ -70,23 +76,38 @@ public class MainController {
     // 만약 알고싶으면 해당 번호에 분포가 어떻고 그런거일거고,
     // 그러면 recommendService 에서 분포나 개수나 그런거 제공해주면 그걸 가져다가 보여주면 될 것.
 
-    @GetMapping("/645/lastInfo")
+    @GetMapping("/{num:[0-9]+}/lastInfo")
     @ResponseBody
-    public Information lastInfo() {
-        return historyService645.getLastInfo();
+    public Information lastInfo(@PathVariable("num") Long num) {
+        if (num.equals(645L))
+            return historyService645.getLastInfo();
+        else if (num.equals(720L))
+            return historyService720.getLastInfo();
+
+        return null;
     }
 
-    @GetMapping("/645/nextInfo")
+    @GetMapping("/{num:[0-9]+}/nextInfo")
     @ResponseBody
-    public Information nowInfo() {
-        return historyService645.getNextInfo();
+    public Information nowInfo(@PathVariable("num") Long num) {
+        if (num.equals(645L))
+            return historyService645.getNextInfo();
+        if (num.equals(720L))
+            return historyService720.getNextInfo();
+
+        return null;
     }
 
-    @GetMapping("/645/recommend") // "/645/recommend?numbers=1,2,3"
+    @GetMapping("/{num:[0-9]+}/recommend") // "/645/recommend?numbers=1,2,3"
     // find 사용하는 용도로 있는 것. 기본 추천은 nextInfo에 있음.
     @ResponseBody
-    public List<List<Long>> recommendNumbersString(@RequestParam(value="numbers", required = false) List<Long> numbers) {
-        return historyService645.getRecommendNumbers(numbers);
+    public List<List<Long>> recommendNumbersString(@PathVariable("num") Long num, @RequestParam(value="numbers", required = false) List<Long> numbers) {
+        if (num.equals(645L))
+            return historyService645.getRecommendNumbers(numbers);
+        if (num.equals(720L))
+            return historyService720.getRecommendNumbers(numbers);
+
+        return null;
     }
 
 /*
