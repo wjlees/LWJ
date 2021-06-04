@@ -3,6 +3,8 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
+import custom_practice as custom
+
 # tensorflow와 tf.keras를 임포트합니다
 import tensorflow
 from tensorflow import keras
@@ -43,6 +45,10 @@ def tensorflow_practice():
     print(train_labels.shape)
     print(test_images.shape)
     print(test_labels.shape)
+    print("============================")
+    print(train_images[0])
+    print(train_labels[0])
+    print("============================")
     # (60000, 28, 28)
     # (60000,)
     # (10000, 28, 28)
@@ -131,6 +137,7 @@ def tensorflow_practice():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
-    tensorflow_practice()
+    custom.custom_main()
+    #tensorflow_practice()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
