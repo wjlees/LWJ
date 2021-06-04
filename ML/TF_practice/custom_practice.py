@@ -64,26 +64,41 @@ def custom_ML():
     # x: count_list[0], y: example[1]
     # data - x: count_list[:-1], y:exmaple[1:]
     train_x = count_list[:-1]
-    train_y = [ex[0] for ex in example[1:]]
-    test_x = train_x[-1:]
-    test_y = train_y[-1:]
+    len_x = len(train_x)
+    train_x_new = []
+    train_y_new = []
+    for i in range(0, len_x):
+        for j in range(0, 6):
+            train_x_new.append(list(train_x[i]))
+            train_y_new.append(example[i][j]-1)
+
+    # train_x = train_x * 6
+    # train_y = [ex[0]-1 for ex in example[1:]]\
+    #           + [ex[1]-1 for ex in example[1:]]\
+    #           + [ex[2]-1 for ex in example[1:]]\
+    #           + [ex[3]-1 for ex in example[1:]]\
+    #           + [ex[4]-1 for ex in example[1:]]\
+    #           + [ex[5]-1 for ex in example[1:]]
+
+    test_x = train_x_new[-6:]
+    test_y = train_y_new[-6:]
     print(test_x)
     print(test_y)
-    train_x = train_x[:-1]
-    train_y = train_y[:-1]
-    train_x = numpy.array(train_x)
-    train_y = numpy.array(train_y)
+    train_x_new = train_x_new[:-6]
+    train_y_new = train_y_new[:-6]
+    train_x_new = numpy.array(train_x_new)
+    train_y_new = numpy.array(train_y_new)
     test_x = numpy.array(test_x)
     test_y = numpy.array(test_y)
 
     print("=================================")
 
     print("==x==")
-    print(train_x)
+    print(train_x_new)
     print("==y==")
-    print(train_y)
-    print(train_x.shape)
-    print(train_y.shape)
+    print(train_y_new)
+    print(train_x_new.shape)
+    print(train_y_new.shape)
 
     model = keras.Sequential([
         keras.layers.Dense(128, activation='relu'),
@@ -95,7 +110,7 @@ def custom_ML():
                   metrics=['accuracy'])
 
     print("compile OK")
-    model.fit(train_x, train_y, epochs=10)
+    model.fit(train_x_new, train_y_new, epochs=100)
     print(test_x)
     print(test_y)
     test_loss, test_acc = model.evaluate(test_x, test_y, verbose=2)
