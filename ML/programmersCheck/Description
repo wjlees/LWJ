@@ -1,0 +1,56 @@
+userID - tagID(user) - tagID(job) - jobID
+x: tagVector(user), tagVector(job), companySize / y: applied
+tag 개수 n 개라고 하면 tagVector [n] 으로 만들 수 있을 것 (값은 0, 1로 표시)
+
+  << 기본 구조 설정 >>
+1. userID
+  user_tags_list : user_tags_list[index] = [userID, tagID] / user_tags_dic[userID] = tag_vector
+2. jobID
+  job_tags_list : job_tags_list[index] = [jobID, tagID] / job_tags_dic[jobID] = tag_vector
+3. tagID
+  tags_list : tags_list[index] = [tagID, keyword] / tags_index_dic[tagID] = index
+*. type(tagVector)
+  type(tagVector) = list : [tagIndex1?, tagIndex2?, tagIndex3?, ..., tagIndexN?]
+4. companyID
+  job_companies_list : job_companies_list[index] = [companyID, jobID, companySize] /
+     job_companysize_dic[jobID] = companySizeVector
+
+  << 진행 방법 및 결과 >>
+1. All zero 로 결과값을 제출하면 85점.
+  따라서 85점보다는 높아야 학습이 된 것..
+2. dictionary 활용
+  tag vector를 사용하면 어떤 태그를 가지고 있는지 [0, 0, 1, 0, 1, 0, ...] 의 vector 로 표현할 수 있다.
+3. userID, jobID를 통해서 user_tag_vector, job_tag_vector를 얻을 수 있고, 이 둘을 사용하여 학습 시킬 수 있다.
+4. user_tag_vector + job_tag_vector / applied 를 사용해서 학습 시키고, 추가로 rating, company size를 더해서 학습시켰음
+5. 위와 같이 학습하면 85점 이하로 나온다.
+6. layer를 조절해봐도, 85점을 간신히 넘김. 아래가 최고점의 layer 구조.
+    model = keras.Sequential([
+        keras.layers.Flatten(input_shape=(1, 887 * 2 + 20 + 7)),
+        keras.layers.Dense(2000, activation='relu', kernel_regularizer='L2'),
+        keras.layers.Dense(500, activation='relu'),
+        keras.layers.Dense(100, activation='relu'),
+        keras.layers.Dense(2, activation='softmax')
+    ])
+
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+    model.fit(train_data_x, train_data_y, epochs=5, validation_split=0.1, shuffle=True)
+
+  << 문제점 분석 >>
+1. 사용하지 않은 파일은 tags.csv
+  이 파일을 보면 tagID가 어떤 tag인지에 대해서 나와있음.
+  String 보면 AWS, JavaScript 등이 있고, AWS EC2, AWS RDS 등이 있다.
+  따라서 tagID를 모두 다르게 보는 것이 아니라 이 사이의 연관성을 찾아야 한다.
+  train data를 사용해서, 만약 지원했다면 tagID의 String에 따라서 연관성을 학습해야할 것.
+  1) tagID 별로 tagVector를 만들었었는데, 이렇게 할게 아니라 tagString 으로 tagVector를 만들어야 했나
+    tagString을 나눠서 각각에 대해서 [2, 1, 0, 0, 1, ...] 에서 각각 [AWS, EC2, Python, ...] 의 횟수별로 체크
+    AWS, AWS EC2 이라면 AWS에 대해서는 2번 나왔고, EC2는 1번 나옴.
+    weight 계산도 AWS에 가중치가 더 붙을 것. 따라서 userTag는 AWS EC2, jobTag는 AWS RDS 라고 하더라도 AWS가 같으므로
+      여기에서 가중치 붙어서 연관이 있어질 것. userTag가 AWS EC2, jobTag가 AWS EC2라면 EC2의 가중치도 포함되므로 더 연관있을 것.
+    기존의 방식에서는 둘 모두 AWS EC2 로 완벽히 일치해야 동일한 것이고, AWS EC2/AWS는 AWS/C++과 동일하게 아예 다르게 인식했음
+  2) 직접 String으로 분석하는 것이 아니라 tagID만 가지고 학습을 통해 연관성을 알아낼 수 있을 것도 같은데,
+    아니면 tagID만으로 하는것이 아니더라도, tagString을 가지고, 어쨌든 train.csv를 통해서 applied, not applied 를 통해서
+      tag끼리의 연관성을 학습할 수 있을 것.
+2.
+
